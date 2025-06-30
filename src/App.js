@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import OrdersPage from './pages/OrdersPage';
-import CartPage from './pages/CartPage'; // 🌐 4.5: Add Route to /cart
+import CartPage from './pages/CartPage';
 import API from './services/api';
 import { CartProvider, CartContext } from './CartContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import './App.css'; // ✅ Import CSS file
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('access'));
@@ -17,22 +19,28 @@ function App() {
   return (
     <Router>
       <CartProvider>
-        <div style={{ padding: '2rem' }}>
+        <div className="app-container">
           <h1>📚 The Book Nook</h1>
           {!isLoggedIn ? (
             <LoginForm onLogin={() => setIsLoggedIn(true)} />
           ) : (
             <>
-              <nav style={{ marginBottom: '1rem' }}>
-                <Link to="/">🏠 Home</Link> |{' '}
-                <Link to="/orders">🧾 Orders</Link> |{' '}
-                <Link to="/cart">🛍️ Cart</Link> |{' '}
-                <button onClick={handleLogout}>Logout</button>
+              <nav className="navbar">
+                <Link to="/" className="nav-link">🏠 Home</Link>
+                <Link to="/orders" className="nav-link">🧾 Orders</Link>
+                <Link to="/cart" className="nav-link">🛍️ Cart</Link>
+                <button onClick={handleLogout} className="logout-btn">
+                  Logout
+                </button>
               </nav>
               <Routes>
                 <Route path="/" element={<BookList />} />
-                <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/cart" element={<CartPage />} /> {/* ✅ Added route */}
+                <Route path="/orders" element={
+                  <ProtectedRoute><OrdersPage /></ProtectedRoute>
+                } />
+                <Route path="/cart" element={
+                  <ProtectedRoute><CartPage /></ProtectedRoute>
+                } />
               </Routes>
             </>
           )}
@@ -42,7 +50,6 @@ function App() {
   );
 }
 
-// 🧾 BookList Component with Add to Cart
 function BookList() {
   const [books, setBooks] = useState([]);
   const { addToCart } = React.useContext(CartContext);
