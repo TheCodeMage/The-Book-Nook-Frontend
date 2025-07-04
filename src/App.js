@@ -1,12 +1,14 @@
+// src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import OrdersPage from './pages/OrdersPage';
 import CartPage from './pages/CartPage';
+import AddBookPage from './pages/AddBookPage'; // ✅ New import
 import API from './services/api';
 import { CartProvider, CartContext } from './CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import './App.css'; // ✅ Import CSS file
+import './App.css'; // ✅ Import CSS
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('access'));
@@ -29,9 +31,8 @@ function App() {
                 <Link to="/" className="nav-link">🏠 Home</Link>
                 <Link to="/orders" className="nav-link">🧾 Orders</Link>
                 <Link to="/cart" className="nav-link">🛍️ Cart</Link>
-                <button onClick={handleLogout} className="logout-btn">
-                  Logout
-                </button>
+                <Link to="/add-book" className="nav-link">➕ Add Book</Link> {/* ✅ Add Book Link */}
+                <button onClick={handleLogout} className="logout-btn">Logout</button>
               </nav>
               <Routes>
                 <Route path="/" element={<BookList />} />
@@ -40,6 +41,9 @@ function App() {
                 } />
                 <Route path="/cart" element={
                   <ProtectedRoute><CartPage /></ProtectedRoute>
+                } />
+                <Route path="/add-book" element={
+                  <ProtectedRoute><AddBookPage /></ProtectedRoute> // ✅ Add Book Route
                 } />
               </Routes>
             </>

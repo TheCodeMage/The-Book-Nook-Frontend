@@ -70,3 +70,15 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+.booklist {
+  margin-top: 2rem;
+}
+
+.book-item {
+  margin-bottom: 0.5rem;
+}
+
+.add-btn {
+  margin-left: 1rem;
+}
