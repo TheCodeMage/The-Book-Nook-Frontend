@@ -1,14 +1,15 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import OrdersPage from './pages/OrdersPage';
 import CartPage from './pages/CartPage';
-import AddBookPage from './pages/AddBookPage'; // ✅ New import
+import AddBookPage from './pages/AddBookPage';
+import AddAuthorPage from './pages/AddAuthorPage';
+import AdminDashboard from './pages/AdminDashboard'; // ✅ NEW
 import API from './services/api';
 import { CartProvider, CartContext } from './CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import './App.css'; // ✅ Import CSS
+import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('access'));
@@ -31,9 +32,12 @@ function App() {
                 <Link to="/" className="nav-link">🏠 Home</Link>
                 <Link to="/orders" className="nav-link">🧾 Orders</Link>
                 <Link to="/cart" className="nav-link">🛍️ Cart</Link>
-                <Link to="/add-book" className="nav-link">➕ Add Book</Link> {/* ✅ Add Book Link */}
+                <Link to="/add-book" className="nav-link">➕ Add Book</Link>
+                <Link to="/add-author" className="nav-link">✏️ Add Author</Link>
+                <Link to="/admin" className="nav-link">📊 Admin</Link> {/* ✅ NEW */}
                 <button onClick={handleLogout} className="logout-btn">Logout</button>
               </nav>
+
               <Routes>
                 <Route path="/" element={<BookList />} />
                 <Route path="/orders" element={
@@ -43,7 +47,13 @@ function App() {
                   <ProtectedRoute><CartPage /></ProtectedRoute>
                 } />
                 <Route path="/add-book" element={
-                  <ProtectedRoute><AddBookPage /></ProtectedRoute> // ✅ Add Book Route
+                  <ProtectedRoute><AddBookPage /></ProtectedRoute>
+                } />
+                <Route path="/add-author" element={
+                  <ProtectedRoute><AddAuthorPage /></ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute><AdminDashboard /></ProtectedRoute> // ✅ NEW
                 } />
               </Routes>
             </>
@@ -56,19 +66,30 @@ function App() {
 
 function BookList() {
   const [books, setBooks] = useState([]);
+  const [search, setSearch] = useState('');
   const { addToCart } = React.useContext(CartContext);
 
   useEffect(() => {
     API.get('/books/')
       .then(res => setBooks(res.data))
-      .catch(err => console.error(err));
+      .catch(err => console.error('Book fetch error:', err));
   }, []);
+
+  const filtered = books.filter(book =>
+    book.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <>
       <h2>📘 Book List</h2>
+      <input
+        placeholder="Search books..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        style={{ marginBottom: '1rem', padding: '0.5rem', width: '100%' }}
+      />
       <ul>
-        {books.map(book => (
+        {filtered.map(book => (
           <li key={book.id} style={{ marginBottom: '0.5rem' }}>
             <strong>{book.title}</strong> by {book.author.name} - {book.price} Ks
             <button onClick={() => addToCart(book)} style={{ marginLeft: '1rem' }}>
